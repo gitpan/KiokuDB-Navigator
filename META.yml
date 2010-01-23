@@ -21,11 +21,14 @@ no_index:
     - share
     - t
 requires:
+  Browser::Open: 0.03
   File::ShareDir: 1.00
   JSORB: 0.04
   KiokuDB: 0.34
   KiokuDB::Cmd: 0.02
   MooseX::Types::Path::Class: 0.05
+  POSIX: 0
+  Path::Class: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.01
+version: 0.02
