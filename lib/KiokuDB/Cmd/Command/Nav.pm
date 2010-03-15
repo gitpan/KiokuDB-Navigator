@@ -3,18 +3,42 @@ use Moose;
 
 use KiokuDB::Navigator;
 
-our $VERSION   = '0.03';
+our $VERSION   = '0.04';
 our $AUTHORITY = 'cpan:STEVAN';
 
 extends 'KiokuDB::Cmd::Base';
    with 'KiokuDB::Cmd::WithDSN::Read';
+
+# the classname of a typemap
+has typemap => (
+    traits        => [ 'Getopt' ],
+    is            => 'ro',
+    isa           => 'Str',
+    predicate     => 'has_typemap',
+    cmd_aliases   => 'T',
+    documentation => 'backend typemap',
+);
+
+sub _get_extra_arguments {
+    my $self = shift;
+    if ( $self->has_typemap ) {
+       my $class = $self->typemap;
+       Class::MOP::load_class( $class );
+       return ( typemap => $class->new );
+    }
+    else {
+       return ();
+    }
+}
+
 
 augment 'run' => sub {
     my $self = shift;
 
     KiokuDB::Navigator->new(
         db => KiokuDB->new(
-            backend => $self->backend
+            backend => $self->backend,
+            $self->_get_extra_arguments
         ),
     )->run;
 };
@@ -33,11 +57,25 @@ KiokuDB::Cmd::Command::Nav - KiokuDB::Cmd extension for KiokuDB::Navigator
 
 =head1 SYNOPSIS
 
-  % kioku nav --dsn bdb:dir=root/db
+  % kioku nav --dsn bdb:dir=root/db [ --typemap MyApp::TypeMap ]
 
 =head1 DESCRIPTION
 
 This is a KiokuDB::Cmd class to provide access to a KiokuDB::Navigator.
+
+=head1 OPTIONS
+
+=over 4
+
+=item I<--dsn>
+
+This is the KiokuDB dsn string and it is required.
+
+=item I<--typemap>
+
+This is the classname of the KiokuDB typemap and it is optional.
+
+=back
 
 =head1 METHODS
 

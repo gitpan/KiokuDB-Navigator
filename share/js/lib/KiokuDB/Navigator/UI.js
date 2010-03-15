@@ -102,19 +102,29 @@ KiokuDB.Navigator.UI.prototype.create_entity_repr = function (obj) {
             out += '<li>' + this.create_repr( obj[i] ) + '</li>';
         }
     }
-    else {
-        // this should handle everything else ...
+    else if (typeof obj === "object") {
+        // other objects
         for (var prop in obj) {
             out += '<li><div class="label">' + prop + '</div><div class="value">';
             out += this.create_repr( obj[prop] );
             out += "</div></li>"
         }
     }
+    else {
+        // collapsed objects
+        out += '<li><div class="label">data</div><div class="value">';
+        out += this.create_repr( obj );
+        out += "</div></li>"
+    }
+
     return out;
 }
 
 KiokuDB.Navigator.UI.prototype.create_repr = function (x) {
     var out = '';
+    if (x === null) {
+        return "<span class='undef'>undef</span>";
+    }
     switch (x.constructor) {
         case Object:
             out += this.create_object_repr(x);
